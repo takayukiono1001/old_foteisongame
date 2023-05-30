@@ -1,5 +1,5 @@
 body {
-  background-color: black;
+  background-color: #1D1816;
 }
 
 .background {
@@ -8,14 +8,14 @@ body {
 
 .square_zone {
   display: grid;
-  grid-template-columns: repeat(99, 100px);
-  grid-template-rows: repeat(99, 100px);
-  gap: 4px;
+  grid-template-columns: repeat(99, 80px);
+  grid-template-rows: repeat(99, 80px);
+  gap: 8px;
 }
 
 .square {
   background-color: #554C4C;
-  border-radius: 5px;
+  border-radius: 4px;
 }
 
 .profile_zone {
@@ -23,29 +23,34 @@ body {
   position: fixed;
   top: 20px;
   left: 20px;
-  width: 300px;
-  height: 200px;
+  width: 224px;
+  height: 227px;
   padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #333333;
-  background-color: #dddddd;
-  font-size: 30px;
-  border-radius: 3px;
+  border-radius: 10px;
   box-shadow: 6px 6px 10px 0px rgba(0, 0, 0, 0.4);
 }
   
 .profile_main{
-
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.image_area{
+.image_area {
+  width: 80px;
+  height: 80px;
+}
 
+.image_area img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .name_area{
-
+  font-family: Poppins;
+  font-size: 20px;
 }
 
 .position{
@@ -83,9 +88,26 @@ body {
 .transaction_status{
 
 }
-                   
-.wallet_zone{
 
+.cta-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  padding: 10px 20px;
+  font-size: 20px;
+  background-color: #ffffff;
+  color: #333333;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+}
+                   
+.wallet_zone {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  color: #ffffff;
+  font-weight: bold;
 }
 
 .square_zone{

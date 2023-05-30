@@ -1,15 +1,42 @@
 // App.js
-// useStateを追加でインポートしています。
 import React, { useEffect, useState } from "react";
 import "./styles/App.css";
 
 const App: React.FC = () => {
-  //manage state
+  //manage account state
   const [currentAccount, setCurrentAccount] = useState<string>("");
+  const [nftImageURI, setNftImageURI] = useState<string>("");
+
+  const contractAddress = "0x6144d927ee371de7e7f8221b596f3432e7a8e6d9";
+  const tokenId = "858";
+
+  //confirms if MetaMask is installed
+  const checkIfWalletIsConnected = async () => {
+    const { ethereum } = window as any;
+    if (!ethereum) {
+      console.log("Make sure you have metamask!");
+      return;
+    } else {
+      console.log("We have the ethereum object", ethereum);
+    }
+
+    // reuqest access to account
+    const accounts = await ethereum.request({ method: "eth_accounts" });
+
+    // use first account
+    if (accounts.length !== 0) {
+      const account = accounts[0];
+      console.log("Found an authorized account:", account);
+      setCurrentAccount(account);
+    } else {
+      console.log("No authorized account found");
+    }
+  };
 
   // connect wallet
   const connectWallet = async () => {
     try {
+      // enable metamask API
       const { ethereum } = window as any;
 
       if (!ethereum) {
@@ -47,48 +74,40 @@ const App: React.FC = () => {
       }
     }
   }
-  
-  //confirms if MetaMask is installed
-  const checkIfWalletIsConnected = async () => {
-    const { ethereum } = window as any;
 
-    if (!ethereum) {
-      console.log("Make sure you have metamask!");
-      return;
-    } else {
-      console.log("We have the ethereum object", ethereum);
-    }
+  const fetchNFTImage = async () => {
+    try {
+      // Opensea APIを使用してNFTのメタデータを取得
+      const response = await fetch(`https://api.opensea.io/api/v1/asset/${contractAddress}/${tokenId}`);
+      const data = await response.json();
+      console.log("Data:", data.top_ownerships[0].owner.address);
 
-    // reuqest access to account
-    const accounts = await ethereum.request({ method: "eth_accounts" });
-
-    // use first account
-    if (accounts.length !== 0) {
-      const account = accounts[0];
-      console.log("Found an authorized account:", account);
-      setCurrentAccount(account);
-    } else {
-      console.log("No authorized account found");
+      // NFTオーナーが接続されたウォレットと一致するか確認
+      if (data && data.top_ownerships[0].owner.address.toLowerCase() === currentAccount.toLowerCase()) {
+        const imageUrl = data.image_url;
+        setNftImageURI(imageUrl);
+      } else {
+        console.log("NFT owner does not match the connected wallet account");
+      }
+    } catch (error) {
+      console.log("Error fetching NFT image:", error);
     }
   };
+  
+  // const renderNotConnectedContainer = () => (
+  //   <div className="connect-wallet-container">
 
-  // レンダリング関数です。まだ Connect されていない場合。
-  const renderNotConnectedContainer = () => (
-    <div className="connect-wallet-container">
-      <img
-        src="https://media.giphy.com/media/3ohhwytHcusSCXXOUg/giphy.gif"
-        alt="Ninja donut gif"
-      />
-      {/* Connect Wallet ボタンが押されたときのみ connectWallet関数 を呼び出します。 */}
-      <button
-        onClick={connectWallet}
-        className="cta-button connect-wallet-button"
-      >
-        Connect Wallet
-      </button>
-    </div>
-  );
+  //     {/* Connect Wallet ボタンが押されたときのみ connectWallet関数 を呼び出します。 */}
+  //     <button
+  //       onClick={connectWallet}
+  //       className="cta-button connect-wallet-button"
+  //     >
+  //       Connect Wallet
+  //     </button>
+  //   </div>
+  // );
 
+  //first check if MetaMask is connected
   useEffect(() => {
     checkIfWalletIsConnected();
   }, []);
@@ -97,33 +116,16 @@ const App: React.FC = () => {
   useEffect(() => {
     if (currentAccount) {
       switchNetwork();
+      fetchNFTImage(); // Fetch NFT image when the currentAccount changes
     } else {
       console.log("No current account");
     }
   }, [currentAccount]);
 
+  // amount of square
   const totalSquares = 99 * 99;
   
   return (
-
-    // <div className="App">
-    //   <div className="container">
-    //     <div className="header-container">
-    //       <header>
-    //         <div className="left">
-    //           <p className="title">🐱‍👤 Ninja Name Service</p>
-    //           <p className="subtitle">Your immortal API on the blockchain!</p>
-    //         </div>
-    //       </header>
-    //     </div>
-
-    //     {/* if currentAccount doesn't exist */}
-    //     {!currentAccount && renderNotConnectedContainer()}
-
-    //     <div className="footer-container">
-    //     </div>
-    //   </div>
-    // </div>
 
     <div id="_next">
       <div id="app">
@@ -140,8 +142,10 @@ const App: React.FC = () => {
             <main>
               <div className="profile_zone">
                 <div className="profile_main">
-                  <div className="image_area"></div>
-                  <div className="name_area"></div>
+                  <div className="image_area">
+                    {nftImageURI !== "" && <img src={nftImageURI} alt="NFT" />}
+                  </div>
+                  <div className="name_area">sher1ock.eth</div>
                   <div className="position">
                     <div className="position_icon"></div>
                     <div className="position_number"></div>
@@ -156,9 +160,18 @@ const App: React.FC = () => {
                   </div>
                 </div>
               </div>
-              <div className="wallet_zone"></div>
+              <div className="wallet_zone">
+                {currentAccount === "" ? (
+                <button onClick={connectWallet} className="cta-button connect-wallet-button">
+                  Connect Wallet
+                </button>
+                ) : (
+                <div className="wallet-address">
+                   {currentAccount}
+                </div>
+                  )}
+              </div>
               <div className="button_zone"></div>
-              <div className="scroll_bar"></div>
             </main>
           </div>
         </div>
