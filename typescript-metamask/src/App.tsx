@@ -29,6 +29,24 @@ const App: React.FC = () => {
       console.log(error);
     }
   };
+
+  // check if the wallet is connected to Mumbai testnet
+  const switchNetwork = async () => {
+    const { ethereum } = window as any;
+    if (ethereum.networkVersion === "80001") {
+      console.log("Connected to Mumbai testnet");
+    } else {
+      alert("Switch to Mumbai testnet");
+      try {
+        await ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0x13881" }],
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  }
   
   //confirms if MetaMask is installed
   const checkIfWalletIsConnected = async () => {
@@ -75,22 +93,74 @@ const App: React.FC = () => {
     checkIfWalletIsConnected();
   }, []);
 
+  // after connecting wallet, execute switchNetwork function
+  useEffect(() => {
+    if (currentAccount) {
+      switchNetwork();
+    } else {
+      console.log("No current account");
+    }
+  }, [currentAccount]);
+
+  const totalSquares = 99 * 99;
+  
   return (
-    <div className="App">
-      <div className="container">
-        <div className="header-container">
-          <header>
-            <div className="left">
-              <p className="title">🐱‍👤 Ninja Name Service</p>
-              <p className="subtitle">Your immortal API on the blockchain!</p>
+
+    // <div className="App">
+    //   <div className="container">
+    //     <div className="header-container">
+    //       <header>
+    //         <div className="left">
+    //           <p className="title">🐱‍👤 Ninja Name Service</p>
+    //           <p className="subtitle">Your immortal API on the blockchain!</p>
+    //         </div>
+    //       </header>
+    //     </div>
+
+    //     {/* if currentAccount doesn't exist */}
+    //     {!currentAccount && renderNotConnectedContainer()}
+
+    //     <div className="footer-container">
+    //     </div>
+    //   </div>
+    // </div>
+
+    <div id="_next">
+      <div id="app">
+        <div data-rk>
+          <style></style>
+          <div className="background">
+          <div className="scrollable-wrapper">
+            <div className="square_zone">
+              {[...Array(totalSquares)].map((_, index) => (
+                <div className="square" key={index} />
+              ))}
             </div>
-          </header>
-        </div>
-
-        {/* currentAccount が存在しない場合、Connect Wallet ボタンを表示します*/}
-        {!currentAccount && renderNotConnectedContainer()}
-
-        <div className="footer-container">
+          </div>
+            <main>
+              <div className="profile_zone">
+                <div className="profile_main">
+                  <div className="image_area"></div>
+                  <div className="name_area"></div>
+                  <div className="position">
+                    <div className="position_icon"></div>
+                    <div className="position_number"></div>
+                  </div>
+                  <div className="balance">
+                    <div className="balance_icon"></div>
+                    <div className="balance_number"></div>
+                  </div>
+                  <div className="transaction">
+                    <div className="transaction_icon"></div>
+                    <div className="transaction_status"></div>
+                  </div>
+                </div>
+              </div>
+              <div className="wallet_zone"></div>
+              <div className="button_zone"></div>
+              <div className="scroll_bar"></div>
+            </main>
+          </div>
         </div>
       </div>
     </div>
